@@ -7,12 +7,13 @@ import * as THREE from "three";
 type Props = { progressRef: RefObject<number> };
 
 function DollyCamera({ progressRef }: Props) {
-  const { camera } = useThree();
+  const { camera, size } = useThree();
 
   useFrame(() => {
     const p = Math.min(1, progressRef.current);
     const eased = 1 - Math.pow(1 - p, 3);
-    camera.position.z = 22 - eased * 20;
+    const nearPosition = size.width < 768 ? 4.1 : 2.8;
+    camera.position.z = 22 - eased * (22 - nearPosition);
     camera.position.y = 0.4 - eased * 0.3;
     camera.rotation.z = eased * 0.15;
     camera.lookAt(0, 0, 0);
@@ -65,7 +66,8 @@ function Ring({ radius, tilt, thickness, opacity, speed }: {
 
 function DustField() {
   const points = useRef<THREE.Points>(null);
-  const count = 1600;
+  const { size } = useThree();
+  const count = size.width < 768 ? 700 : 1400;
 
   const positions = useMemo(() => {
     const arr = new Float32Array(count * 3);
@@ -75,7 +77,7 @@ function DustField() {
       arr[i * 3 + 2] = (Math.random() - 0.5) * 40;
     }
     return arr;
-  }, []);
+  }, [count]);
 
   useFrame((_, d) => {
     if (points.current) points.current.rotation.y += d * 0.025;
@@ -88,7 +90,7 @@ function DustField() {
       </bufferGeometry>
       <pointsMaterial
         color="#e8e1d3"
-        size={0.055}
+        size={size.width < 768 ? 0.07 : 0.055}
         sizeAttenuation
         transparent
         opacity={0.8}
@@ -101,7 +103,7 @@ function DustField() {
 export default function PreloaderScene({ progressRef }: Props) {
   return (
     <Canvas
-      dpr={[1, 2]}
+      dpr={[1, 1.35]}
       camera={{ position: [0, 0.4, 22], fov: 46 }}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       style={{ background: "transparent" }}
