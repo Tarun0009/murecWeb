@@ -18,13 +18,13 @@ export function useSmoothScroll() {
     }
 
     const lenis = new Lenis({
-      lerp: isTouchDevice ? 0.045 : 0.07,
+      lerp: isTouchDevice ? 0.1 : 0.07,
       smoothWheel: true,
       wheelMultiplier: 0.55,
-      touchMultiplier: isTouchDevice ? 0.52 : 0.9,
+      touchMultiplier: isTouchDevice ? 1 : 0.9,
       syncTouch: true,
-      syncTouchLerp: isTouchDevice ? 0.04 : 0.075,
-      touchInertiaExponent: isTouchDevice ? 1.18 : 1.7,
+      syncTouchLerp: 0.075,
+      touchInertiaExponent: 1.7,
       gestureOrientation: "vertical",
       overscroll: false,
     });

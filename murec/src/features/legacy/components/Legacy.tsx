@@ -18,33 +18,47 @@ export function Legacy() {
     const section = content?.closest("section");
     if (!content || !section) return;
 
+    const media = gsap.matchMedia();
     const context = gsap.context(() => {
       const steps = gsap.utils.toArray<HTMLElement>("[data-legacy-step]", content);
-      gsap.set(steps, { autoAlpha: 0, y: 42, filter: "blur(9px)" });
 
-      const timeline = gsap.timeline({
-        scrollTrigger: {
-          trigger: section,
-          start: "top bottom",
-          end: "+=210%",
-          scrub: true,
-          invalidateOnRefresh: true,
-        },
-      });
-
-      steps.forEach((step) => {
-        timeline.to(step, {
-          autoAlpha: 1,
-          y: 0,
-          filter: "blur(0px)",
-          duration: 0.25,
-          ease: "none",
+      const buildTimeline = (start: string, end: string, scrub: boolean | number) => {
+        gsap.set(steps, { autoAlpha: 0, y: 42, filter: "blur(9px)" });
+        const timeline = gsap.timeline({
+          scrollTrigger: {
+            trigger: section,
+            start,
+            end,
+            scrub,
+            invalidateOnRefresh: true,
+          },
         });
+
+        steps.forEach((step) => {
+          timeline.to(step, {
+            autoAlpha: 1,
+            y: 0,
+            filter: "blur(0px)",
+            duration: 0.25,
+            ease: "none",
+          });
+        });
+
+        return () => timeline.kill();
+      };
+
+      media.add("(min-width: 768px)", () => buildTimeline("top bottom", "+=210%", true));
+      media.add("(max-width: 767px)", () => {
+        gsap.set(steps, { autoAlpha: 1, y: 0, filter: "blur(0px)" });
+        return () => gsap.set(steps, { clearProps: "opacity,visibility,transform,filter" });
       });
     }, content);
 
     ScrollTrigger.refresh();
-    return () => context.revert();
+    return () => {
+      media.revert();
+      context.revert();
+    };
   }, []);
 
   return (
