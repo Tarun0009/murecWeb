@@ -1,6 +1,6 @@
 "use client";
 
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useMemo, useRef, type RefObject } from "react";
 import * as THREE from "three";
 
@@ -10,6 +10,7 @@ function Water({ scrollRef }: Props) {
   const surface = useRef<THREE.ShaderMaterial>(null);
   const rig = useRef<THREE.Group>(null);
   const smooth = useRef(0);
+  const { size } = useThree();
   const uniforms = useMemo(
     () => ({
       uTime: { value: 0 },
@@ -29,11 +30,17 @@ function Water({ scrollRef }: Props) {
       surface.current.uniforms.uScroll.value = progress;
     }
     if (rig.current) {
-      rig.current.rotation.z = -0.06 + progress * 0.12;
-      rig.current.position.z = 0.8 - progress * 1.1;
-      rig.current.scale.setScalar(0.78 + progress * 0.38);
+      rig.current.rotation.z = -0.11 + progress * 0.22;
+      rig.current.position.y = -1 + progress * 0.34;
+      rig.current.position.z = 1.8 - progress * 2.25;
+      rig.current.scale.setScalar(0.58 + progress * 0.78);
     }
-    camera.position.set(0, 2.7 - progress * 1.15, 7.4 - progress * 3.4);
+    const nearPosition = size.width < 768 ? 3.8 : 3.05;
+    camera.position.set(
+      Math.sin(progress * 0.42) * 0.5,
+      3.2 - progress * 1.75,
+      9.2 - progress * (9.2 - nearPosition)
+    );
     camera.lookAt(0, -0.65, 0);
   });
 
@@ -56,9 +63,10 @@ function Water({ scrollRef }: Props) {
               vUv = uv;
               vec3 p = position;
               float sweep = uScroll * 4.0;
-              float a = sin(p.x * 1.35 + uTime * .55 + sweep) * .18;
-              float b = cos(p.y * 1.8 - uTime * .42) * .11;
-              float c = sin((p.x + p.y) * 2.6 + uTime * .3) * .055;
+              float strength = .72 + uScroll * .72;
+              float a = sin(p.x * 1.35 + uTime * .62 + sweep) * .22 * strength;
+              float b = cos(p.y * 1.8 - uTime * .48) * .14 * strength;
+              float c = sin((p.x + p.y) * 2.6 + uTime * .34) * .075 * strength;
               p.z += a + b + c;
               vWave = a + b + c;
               gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
@@ -71,12 +79,12 @@ function Water({ scrollRef }: Props) {
             varying float vWave;
             varying vec2 vUv;
             void main() {
-              float crest = smoothstep(.02, .28, vWave);
-              float line = pow(max(0.0, sin((vUv.x + vUv.y) * 34.0 + vWave * 15.0)), 18.0);
+              float crest = smoothstep(-.01, .25, vWave);
+              float line = pow(max(0.0, sin((vUv.x + vUv.y) * 36.0 + vWave * 17.0)), 14.0);
               float edge = smoothstep(.72, .16, distance(vUv, vec2(.5)));
-              vec3 water = mix(uInk, uEmerald, crest * .72);
-              water = mix(water, uBrass, line * crest * .32);
-              gl_FragColor = vec4(water, edge * .72);
+              vec3 water = mix(uInk, uEmerald, crest * .9);
+              water = mix(water, uBrass, line * crest * .48);
+              gl_FragColor = vec4(water, edge * .9);
             }
           `}
         />
@@ -89,7 +97,7 @@ export default function FooterWaterScene({ scrollRef }: Props) {
   return (
     <Canvas
       dpr={[1, 1.35]}
-      camera={{ position: [0, 2.7, 7.4], fov: 44 }}
+      camera={{ position: [0, 3.2, 9.2], fov: 44 }}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       style={{ background: "transparent" }}
     >

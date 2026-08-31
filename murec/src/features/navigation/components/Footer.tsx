@@ -20,7 +20,7 @@ export function Footer() {
       trigger: footer,
       start: "top bottom",
       end: "bottom bottom",
-      scrub: 0.12,
+      scrub: 0.08,
       invalidateOnRefresh: true,
       onUpdate: (self) => {
         scrollRef.current = self.progress;
@@ -31,10 +31,10 @@ export function Footer() {
 
   return (
     <footer ref={footerRef} className="relative isolate overflow-hidden border-t border-cream/10 bg-[#050706]">
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-0 opacity-80">
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-0 opacity-95">
         <FooterWaterScene scrollRef={scrollRef} />
       </div>
-      <div className="pointer-events-none absolute inset-0 z-[1] bg-linear-to-b from-[#050706]/60 via-[#050706]/72 to-[#050706]" />
+      <div className="pointer-events-none absolute inset-0 z-[1] bg-linear-to-b from-[#050706]/35 via-[#050706]/52 to-[#050706]/90" />
 
       <div className="container-page relative z-10 py-16 md:py-20">
         <h2 className="font-display text-3xl uppercase tracking-[0.04em] text-cream md:text-4xl">The MUREC Team</h2>
