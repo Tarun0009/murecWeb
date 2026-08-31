@@ -24,6 +24,7 @@ export type SceneVariant =
 
 function LegacyMesh({ scrollRef }: { scrollRef: { current: number } }) {
   const g = useRef<THREE.Group>(null);
+  const { size } = useThree();
   const frames = useMemo(() => Array.from({ length: 22 }), []);
   const curve = useMemo(() => {
     const points = Array.from({ length: 34 }, (_, index) => {
@@ -49,9 +50,13 @@ function LegacyMesh({ scrollRef }: { scrollRef: { current: number } }) {
   useFrame(() => {
     if (!g.current) return;
     const s = scrollRef.current;
+    const isSmallScreen = size.width < 768;
     g.current.rotation.y = -s * Math.PI * 1.35;
     g.current.rotation.z = -s * 0.24;
+    g.current.position.x = isSmallScreen ? 0.5 : 1.65;
     g.current.position.y = -0.85 + s * 1.7;
+    g.current.position.z = isSmallScreen ? 0.45 - s * 0.35 : 0;
+    g.current.scale.setScalar(isSmallScreen ? 0.68 : 1);
   });
 
   return (
