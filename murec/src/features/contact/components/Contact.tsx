@@ -22,9 +22,9 @@ export function Contact() {
   };
 
   return (
-    <Section id="contact" scene="contact" className="border-t border-cream/10 !py-20 md:!py-24">
-      <div className="grid gap-12 md:grid-cols-[1.1fr_0.9fr] md:items-center md:gap-20">
-        <div className="flex flex-col gap-8">
+    <Section id="contact" scene="contact" className="border-t border-cream/10">
+      <div className="grid gap-12 md:grid-cols-[1.1fr_0.9fr] md:items-center md:gap-16 lg:gap-20">
+        <div className="flex flex-col gap-7 md:gap-8">
           <Eyebrow index="06">Get in touch</Eyebrow>
           <Reveal>
             <h2 className="font-display text-5xl leading-[1.02] text-cream md:text-7xl">
@@ -33,7 +33,7 @@ export function Contact() {
           </Reveal>
 
           <Reveal>
-            <div className="mt-4 flex flex-col gap-8 border-t border-cream/10 pt-8">
+            <div className="mt-2 flex flex-col gap-7 border-t border-cream/10 pt-7 md:mt-4 md:gap-8 md:pt-8">
               <div>
                 <div className="eyebrow mb-2">Studio</div>
                 <address className="not-italic text-base leading-relaxed text-cream/85">
@@ -68,7 +68,7 @@ export function Contact() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false, margin: "-10% 0px" }}
           transition={{ duration: 0.9, ease }}
-          className="glass-surface flex w-full max-w-lg flex-col gap-6 justify-self-end p-6 sm:p-7 md:p-8"
+          className="glass-surface flex w-full max-w-lg flex-col gap-6 justify-self-end p-5 sm:p-6 md:p-7 lg:p-8"
         >
           <div className="grid grid-cols-1 gap-x-8 gap-y-7 sm:grid-cols-2">
             <Field label="Full name" name="name" required />

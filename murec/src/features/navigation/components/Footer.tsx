@@ -36,10 +36,10 @@ export function Footer() {
       </div>
       <div className="pointer-events-none absolute inset-0 z-[1] bg-linear-to-b from-[#050706]/35 via-[#050706]/52 to-[#050706]/90" />
 
-      <div className="container-page relative z-10 py-16 md:py-20">
+      <div className="container-page relative z-10 py-14 md:py-18 lg:py-20">
         <h2 className="font-display text-3xl uppercase tracking-[0.04em] text-cream md:text-4xl">The MUREC Team</h2>
 
-        <div className="mt-14 grid gap-10 md:mt-20 md:grid-cols-[1.45fr_0.75fr_0.75fr] md:gap-12">
+        <div className="mt-12 grid gap-9 md:mt-16 md:grid-cols-[1.45fr_0.75fr_0.75fr] md:gap-10 lg:gap-12">
           <FooterItem icon={<LocationIcon />} label="Corporate Address:">
             <address className="not-italic">
               Madhusudan, 2nd Floor, Riana Towers, 51-52,
@@ -55,7 +55,7 @@ export function Footer() {
           </FooterItem>
         </div>
 
-        <p className="mt-16 max-w-none text-sm leading-[1.75] text-cream/72 md:mt-24 md:text-base">
+        <p className="mt-14 max-w-none text-sm leading-[1.75] text-cream/72 md:mt-20 md:text-base">
           This website is purely conceptual and not a legal document. All layouts, specifications, amenities, and
           visuals are subject to change as may be decided by MUREC or the competent authority. No information herein
           shall be construed as an offer, solicitation, or invitation to purchase. Interested parties are requested

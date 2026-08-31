@@ -11,7 +11,7 @@ import { ease } from "@shared/lib/motion";
 export function Partners() {
   return (
     <Section id="partners" scene="partners">
-      <div className="mb-16 flex flex-col gap-6">
+      <div className="mb-12 flex flex-col gap-6 md:mb-16">
         <Eyebrow index="05">From our partners</Eyebrow>
         <Reveal>
           <h2 className="font-display text-5xl leading-[1.02] text-cream md:max-w-3xl md:text-7xl">
@@ -20,7 +20,7 @@ export function Partners() {
         </Reveal>
       </div>
 
-      <ul className="grid gap-8 xl:grid-cols-2">
+      <ul className="grid gap-6 lg:gap-8 xl:grid-cols-2">
         {partners.map((p) => (
           <motion.li
             key={p.name}
@@ -40,7 +40,7 @@ export function Partners() {
               />
               <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-ink/35 via-transparent to-transparent sm:bg-linear-to-r sm:from-transparent sm:to-ink/12" />
             </div>
-            <div className="flex min-w-0 flex-col p-7 sm:p-8 lg:p-9">
+            <div className="flex min-w-0 flex-col p-6 sm:p-7 lg:p-8">
               <h3 className="font-display text-3xl leading-none text-cream md:text-4xl">{p.name}</h3>
               <span className="mt-4 h-px w-12 bg-brass/70" />
               <blockquote className="mt-6 text-sm leading-[1.75] text-cream/72 md:text-[15px]">

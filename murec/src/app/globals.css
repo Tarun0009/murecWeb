@@ -104,14 +104,17 @@ select {
 }
 
 .section {
-  padding-block: clamp(96px, 12vw, 180px);
+  display: flex;
+  min-height: 100dvh;
+  align-items: center;
+  padding-block: clamp(80px, 9vw, 128px);
 }
 
 .container-page {
   width: 100%;
   max-width: 1440px;
   margin-inline: auto;
-  padding-inline: clamp(20px, 4vw, 56px);
+  padding-inline: clamp(20px, 4.5vw, 64px);
 }
 
 @media (prefers-reduced-motion: reduce) {

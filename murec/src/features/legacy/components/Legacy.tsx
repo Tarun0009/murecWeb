@@ -63,8 +63,8 @@ export function Legacy() {
 
   return (
     <Section id="legacy" scene="legacy">
-      <div ref={contentRef} className="grid gap-16 md:grid-cols-[0.9fr_1.1fr] md:gap-24">
-        <div className="flex flex-col gap-8">
+      <div ref={contentRef} className="grid gap-12 md:grid-cols-[0.9fr_1.1fr] md:gap-20">
+        <div className="flex flex-col gap-7 md:gap-8">
           <div data-legacy-step><Eyebrow index="01">The Legacy</Eyebrow></div>
           <div data-legacy-step>
             <h2 className="font-display text-5xl leading-[1.02] text-cream md:text-7xl">
@@ -82,9 +82,9 @@ export function Legacy() {
           </div>
         </div>
 
-        <div className="flex flex-col justify-end md:pl-8">
+        <div className="flex flex-col justify-end md:pl-6 lg:pl-8">
           <div data-legacy-step>
-            <div className="flex items-baseline gap-4 border-t border-cream/10 pt-8">
+            <div className="flex items-baseline gap-4 border-t border-cream/10 pt-7 md:pt-8">
               <span className="font-display text-7xl leading-none text-brass md:text-9xl">
                 {site.legacyYears}+
               </span>

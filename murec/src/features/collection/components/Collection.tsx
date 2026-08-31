@@ -9,7 +9,7 @@ export function Collection() {
   return (
     <Section id="collection" scene="collection">
       <div className="max-w-3xl">
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-6 md:gap-7">
           <Eyebrow index="03">Portfolio</Eyebrow>
           <Reveal>
             <h2 className="font-display text-5xl leading-[1.02] text-cream md:text-7xl">

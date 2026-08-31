@@ -48,6 +48,7 @@ function Orbit({ radius, tilt, speed, orbSize, orbColor, ringOpacity }: OrbitPro
 function Particles({ scrollRef }: Props) {
   const points = useRef<THREE.Points>(null);
   const material = useRef<THREE.ShaderMaterial>(null);
+  const { size } = useThree();
   const count = 3200;
 
   const { positions, scales, phases } = useMemo(() => {
@@ -71,6 +72,7 @@ function Particles({ scrollRef }: Props) {
     if (!points.current || !material.current) return;
     material.current.uniforms.uTime.value = clock.elapsedTime;
     material.current.uniforms.uScroll.value = scrollRef.current;
+    points.current.position.x = size.width < 768 ? 0 : 1.55;
     points.current.rotation.y = scrollRef.current * -0.42;
     points.current.rotation.x = -0.08 + scrollRef.current * 0.16;
   });
@@ -137,11 +139,8 @@ function OrbitalSystem({ scrollRef }: Props) {
   const g = useRef<THREE.Group>(null);
   const { viewport } = useThree();
 
-  const responsiveScale = Math.min(0.92, viewport.width / 5.4);
-  const responsiveX = Math.max(
-    0,
-    viewport.width / 2 - 2.4 * responsiveScale - 0.18
-  );
+  const responsiveScale = Math.min(0.78, viewport.width / 5.8);
+  const responsiveX = viewport.width < 6 ? 0 : Math.min(1.7, viewport.width / 2 - 2.4 * responsiveScale - 0.38);
 
   useFrame(({ camera, size }, delta) => {
     if (!g.current) return;
@@ -150,8 +149,13 @@ function OrbitalSystem({ scrollRef }: Props) {
     const visibleHeight =
       2 * Math.tan(THREE.MathUtils.degToRad(perspectiveCamera.fov) / 2) * camera.position.z;
     const visibleWidth = visibleHeight * (size.width / size.height);
-    const safeScale = Math.min(0.92, visibleWidth / 5.4);
-    const safeX = Math.max(0, visibleWidth / 2 - 2.4 * safeScale - 0.18);
+    const isSmallScreen = size.width < 768;
+    const safeScale = isSmallScreen
+      ? Math.min(0.72, visibleWidth / 5.6)
+      : Math.min(0.78, visibleWidth / 5.8);
+    const safeX = isSmallScreen
+      ? 0
+      : Math.max(0, Math.min(1.7, visibleWidth / 2 - 2.4 * safeScale - 0.38));
 
     g.current.scale.setScalar(safeScale);
     g.current.position.x = safeX;
@@ -202,7 +206,7 @@ function DollyCamera({ scrollRef }: Props) {
 
   useFrame(() => {
     const s = scrollRef.current;
-    camera.position.z = 5.6 - s * 2.4;
+    camera.position.z = 5.6 - s * 1.55;
     camera.position.y = 0.8 + s * 0.3;
     camera.lookAt(0, 0, 0);
   });

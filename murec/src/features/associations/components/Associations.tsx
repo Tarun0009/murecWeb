@@ -16,9 +16,9 @@ const associationLogos = [
 export function Associations() {
   return (
     <Section id="associations" scrollLength={400} className="min-h-dvh border-y border-cream/10 bg-ink-raised" bare>
-      <div className="flex min-h-dvh items-center py-24 md:py-32">
-        <div className="grid w-full items-center gap-14 md:grid-cols-[0.78fr_1.22fr] md:gap-16">
-        <div className="flex max-w-xl flex-col gap-7">
+      <div className="flex min-h-dvh items-center py-20 sm:py-24 lg:py-28">
+        <div className="grid w-full items-center gap-12 md:grid-cols-[0.78fr_1.22fr] md:gap-14 lg:gap-16">
+        <div className="flex max-w-xl flex-col gap-6 md:gap-7">
           <Eyebrow>Our associations</Eyebrow>
           <Reveal>
             <h2 className="font-display text-5xl leading-[0.98] text-cream md:text-7xl">
