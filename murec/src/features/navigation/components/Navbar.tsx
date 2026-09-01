@@ -9,12 +9,38 @@ import { cn } from "@shared/lib/cn";
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("top");
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 32);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 32);
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      setScrollProgress(scrollable > 0 ? Math.min(window.scrollY / scrollable, 1) : 0);
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const sectionIds = ["top", ...site.nav.map((item) => item.href.slice(1))];
+    const sections = sectionIds
+      .map((id) => document.getElementById(id))
+      .filter((section): section is HTMLElement => Boolean(section));
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (visible) setActiveSection(visible.target.id);
+      },
+      { rootMargin: "-25% 0px -55%", threshold: [0, 0.2, 0.5, 0.75] }
+    );
+
+    sections.forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -22,6 +48,15 @@ export function Navbar() {
     return () => {
       document.body.style.overflow = "";
     };
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (event: globalThis.KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
   }, [open]);
 
   return (
@@ -52,10 +87,17 @@ export function Navbar() {
               <a
                 key={item.href}
                 href={item.href}
-                className="group relative text-[12px] uppercase tracking-[0.24em] text-cream/70 transition-colors hover:text-cream"
+                aria-current={activeSection === item.href.slice(1) ? "location" : undefined}
+                className={cn(
+                  "group relative text-[12px] uppercase tracking-[0.24em] transition-colors hover:text-cream",
+                  activeSection === item.href.slice(1) ? "text-cream" : "text-cream/70"
+                )}
               >
                 {item.label}
-                <span className="absolute -bottom-2 left-0 h-px w-0 bg-brass transition-all duration-500 group-hover:w-full" />
+                <span className={cn(
+                  "absolute -bottom-2 left-0 h-px bg-brass transition-all duration-500 group-hover:w-full",
+                  activeSection === item.href.slice(1) ? "w-full" : "w-0"
+                )} />
               </a>
             ))}
           </nav>
@@ -83,6 +125,11 @@ export function Navbar() {
           </div>
         </div>
         <div className="hairline h-px w-full border-t" />
+        <div
+          aria-hidden
+          className="absolute bottom-0 left-0 h-px origin-left bg-brass"
+          style={{ width: `${scrollProgress * 100}%` }}
+        />
       </motion.header>
 
       <AnimatePresence>
@@ -115,6 +162,23 @@ export function Navbar() {
               </div>
             </div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {scrolled && (
+          <motion.a
+            href="#top"
+            aria-label="Back to top"
+            initial={{ opacity: 0, y: 12, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 12, scale: 0.9 }}
+            whileHover={{ y: -3 }}
+            whileTap={{ scale: 0.94 }}
+            className="fixed bottom-5 right-5 z-30 flex h-11 w-11 items-center justify-center rounded-full border border-brass/40 bg-ink/80 text-lg text-brass shadow-lg backdrop-blur-md transition-colors hover:border-brass hover:bg-ink md:bottom-7 md:right-7"
+          >
+            <span aria-hidden>↑</span>
+          </motion.a>
         )}
       </AnimatePresence>
     </>

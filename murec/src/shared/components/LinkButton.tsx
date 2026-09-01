@@ -29,9 +29,6 @@ export function LinkButton({ href, onClick, children, variant = "outline", class
       transition={{ duration: 0.25 }}
     >
       <span>{children}</span>
-      <span className="relative inline-block h-px w-6 overflow-hidden">
-        <span className="absolute inset-y-0 left-0 w-full bg-current transition-transform duration-500 ease-out group-hover:translate-x-1" />
-      </span>
       <span aria-hidden className="text-lg leading-none transition-transform duration-500 group-hover:translate-x-1">→</span>
     </motion.span>
   );
