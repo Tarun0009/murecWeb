@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import gsap from "gsap";
@@ -23,6 +23,7 @@ export function Hero() {
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
 
   const sceneScroll = useRef(0);
+  const scenePointer = useRef({ x: 0, y: 0, active: false });
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
   const opacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
 
@@ -63,6 +64,30 @@ export function Hero() {
     return () => media.revert();
   }, []);
 
+  useEffect(() => {
+    const hero = ref.current;
+    if (!hero) return;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    const onPointerMove = (event: PointerEvent) => {
+      if (reducedMotion.matches || event.pointerType === "touch") return;
+      const bounds = hero.getBoundingClientRect();
+      scenePointer.current.x = ((event.clientX - bounds.left) / bounds.width) * 2 - 1;
+      scenePointer.current.y = -(((event.clientY - bounds.top) / bounds.height) * 2 - 1);
+      scenePointer.current.active = true;
+    };
+    const onPointerLeave = () => {
+      scenePointer.current.active = false;
+    };
+
+    hero.addEventListener("pointermove", onPointerMove);
+    hero.addEventListener("pointerleave", onPointerLeave);
+    return () => {
+      hero.removeEventListener("pointermove", onPointerMove);
+      hero.removeEventListener("pointerleave", onPointerLeave);
+    };
+  }, []);
+
   return (
     <section
       id="top"
@@ -71,7 +96,7 @@ export function Hero() {
     >
       <div className="pointer-events-none absolute inset-0 z-0">
         <div className="absolute inset-0">
-          <HeroScene scrollRef={sceneScroll} />
+          <HeroScene scrollRef={sceneScroll} pointerRef={scenePointer} />
         </div>
         <div className="absolute inset-x-0 bottom-0 h-32 bg-linear-to-t from-ink to-transparent" />
         <div className="absolute inset-y-0 left-0 w-full bg-linear-to-r from-ink via-ink/76 to-transparent sm:w-3/4 lg:w-[58%]" />

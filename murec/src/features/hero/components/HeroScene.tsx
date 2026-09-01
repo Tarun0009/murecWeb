@@ -4,7 +4,11 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useMemo, useRef, type RefObject } from "react";
 import * as THREE from "three";
 
-type Props = { scrollRef: RefObject<number> };
+type PointerState = { x: number; y: number; active: boolean };
+type Props = {
+  scrollRef: RefObject<number>;
+  pointerRef: RefObject<PointerState>;
+};
 
 type OrbitProps = {
   radius: number;
@@ -45,7 +49,7 @@ function Orbit({ radius, tilt, speed, orbSize, orbColor, ringOpacity }: OrbitPro
   );
 }
 
-function Particles({ scrollRef }: Props) {
+function Particles({ scrollRef, pointerRef }: Props) {
   const points = useRef<THREE.Points>(null);
   const material = useRef<THREE.ShaderMaterial>(null);
   const { size } = useThree();
@@ -68,13 +72,34 @@ function Particles({ scrollRef }: Props) {
     return { positions: positionArray, scales: scaleArray, phases: phaseArray };
   }, []);
 
-  useFrame(({ clock }) => {
+  useFrame(({ clock }, delta) => {
     if (!points.current || !material.current) return;
     material.current.uniforms.uTime.value = clock.elapsedTime;
     material.current.uniforms.uScroll.value = scrollRef.current;
-    points.current.position.x = size.width < 768 ? 0 : 1.55;
-    points.current.rotation.y = scrollRef.current * -0.42;
-    points.current.rotation.x = -0.08 + scrollRef.current * 0.16;
+    const pointer = pointerRef.current;
+    const influence = pointer.active ? 1 : 0;
+    const easing = 1 - Math.exp(-delta * 4.5);
+    const baseX = size.width < 768 ? 0 : 1.55;
+    points.current.position.x = THREE.MathUtils.lerp(
+      points.current.position.x,
+      baseX + pointer.x * 0.32 * influence,
+      easing
+    );
+    points.current.position.y = THREE.MathUtils.lerp(
+      points.current.position.y,
+      pointer.y * 0.24 * influence,
+      easing
+    );
+    points.current.rotation.y = THREE.MathUtils.lerp(
+      points.current.rotation.y,
+      scrollRef.current * -0.42 + pointer.x * 0.13 * influence,
+      easing
+    );
+    points.current.rotation.x = THREE.MathUtils.lerp(
+      points.current.rotation.x,
+      -0.08 + scrollRef.current * 0.16 - pointer.y * 0.1 * influence,
+      easing
+    );
   });
 
   return (
@@ -135,7 +160,7 @@ function Particles({ scrollRef }: Props) {
   );
 }
 
-function OrbitalSystem({ scrollRef }: Props) {
+function OrbitalSystem({ scrollRef, pointerRef }: Props) {
   const g = useRef<THREE.Group>(null);
   const { viewport } = useThree();
 
@@ -158,9 +183,13 @@ function OrbitalSystem({ scrollRef }: Props) {
       : Math.max(0, Math.min(1.7, visibleWidth / 2 - 2.4 * safeScale - 0.38));
 
     g.current.scale.setScalar(safeScale);
-    g.current.position.x = safeX;
+    const pointer = pointerRef.current;
+    const influence = pointer.active ? 1 : 0;
+    const easing = 1 - Math.exp(-delta * 3.8);
+    g.current.position.x = THREE.MathUtils.lerp(g.current.position.x, safeX + pointer.x * 0.16 * influence, easing);
+    g.current.position.y = THREE.MathUtils.lerp(g.current.position.y, -0.05 + pointer.y * 0.12 * influence, easing);
     g.current.rotation.y += delta * 0.14;
-    g.current.rotation.x = -0.25 - s * 0.3;
+    g.current.rotation.x = THREE.MathUtils.lerp(g.current.rotation.x, -0.25 - s * 0.3 - pointer.y * 0.08 * influence, easing);
   });
 
   return (
@@ -201,7 +230,7 @@ function OrbitalSystem({ scrollRef }: Props) {
   );
 }
 
-function DollyCamera({ scrollRef }: Props) {
+function DollyCamera({ scrollRef }: Pick<Props, "scrollRef">) {
   const { camera } = useThree();
 
   useFrame(() => {
@@ -214,7 +243,7 @@ function DollyCamera({ scrollRef }: Props) {
   return null;
 }
 
-export default function HeroScene({ scrollRef }: Props) {
+export default function HeroScene({ scrollRef, pointerRef }: Props) {
   return (
     <Canvas
       dpr={[1, 1.75]}
@@ -228,8 +257,8 @@ export default function HeroScene({ scrollRef }: Props) {
       <spotLight position={[0, 5, 3]} intensity={0.5} angle={0.4} penumbra={1} color="#ffd88a" />
 
       <DollyCamera scrollRef={scrollRef} />
-      <Particles scrollRef={scrollRef} />
-      <OrbitalSystem scrollRef={scrollRef} />
+      <Particles scrollRef={scrollRef} pointerRef={pointerRef} />
+      <OrbitalSystem scrollRef={scrollRef} pointerRef={pointerRef} />
     </Canvas>
   );
 }
