@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 
@@ -15,15 +15,17 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 export function Preloader() {
   const [visible, setVisible] = useState(true);
   const [progress, setProgress] = useState(0);
-  const [render3D, setRender3D] = useState(false);
   const progressRef = useRef(0);
+  const sceneReadyRef = useRef(false);
+
+  const onSceneReady = useCallback(() => {
+    sceneReadyRef.current = true;
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const isSmallDevice = window.matchMedia("(max-width: 767px), (pointer: coarse)").matches;
-    setRender3D(!isSmallDevice);
-    const minimumDuration = isSmallDevice ? 2200 : 2800;
-    const maximumDuration = 5200;
+    const minimumDuration = 2800;
+    const maximumDuration = 12000;
     const previousBodyOverflow = document.body.style.overflow;
     const previousHtmlOverflow = document.documentElement.style.overflow;
     const previousOverscroll = document.body.style.overscrollBehavior;
@@ -32,6 +34,7 @@ export function Preloader() {
     document.body.style.overscrollBehavior = "none";
 
     const start = performance.now();
+    let animationStart = 0;
     let rafId = 0;
     let exitTimer = 0;
     let assetsReady = false;
@@ -64,11 +67,14 @@ export function Preloader() {
 
     const tick = (now: number) => {
       const elapsed = now - start;
-      const timedProgress = Math.min(1, elapsed / minimumDuration);
-      const p = assetsReady ? timedProgress : Math.min(0.92, timedProgress * 0.92);
+      const ready = assetsReady && sceneReadyRef.current;
+      if (ready && animationStart === 0) animationStart = now;
+      const animationElapsed = animationStart === 0 ? 0 : now - animationStart;
+      const timedProgress = Math.min(1, animationElapsed / minimumDuration);
+      const p = ready ? timedProgress : 0;
       progressRef.current = p;
       setProgress(p);
-      if ((assetsReady && elapsed >= minimumDuration) || elapsed >= maximumDuration) {
+      if ((ready && animationElapsed >= minimumDuration) || elapsed >= maximumDuration) {
         finish();
       } else {
         rafId = requestAnimationFrame(tick);
@@ -94,7 +100,7 @@ export function Preloader() {
           className="fixed inset-0 z-[100] h-[100svh] w-screen touch-none overscroll-none bg-ink"
         >
           <div className="absolute inset-0">
-            {render3D ? <PreloaderScene progressRef={progressRef} /> : <MobilePreloaderVisual progress={progress} />}
+            <PreloaderScene progressRef={progressRef} onReady={onSceneReady} />
           </div>
 
           <div
@@ -148,35 +154,5 @@ export function Preloader() {
         </motion.div>
       )}
     </AnimatePresence>
-  );
-}
-
-function MobilePreloaderVisual({ progress }: { progress: number }) {
-  const scale = 0.72 + progress * 0.3;
-  return (
-    <div className="absolute inset-0 grid place-items-center overflow-hidden">
-      <motion.div
-        className="relative size-[270px]"
-        style={{ scale, rotate: progress * 24 }}
-        transition={{ ease: "linear" }}
-      >
-        <motion.span
-          className="absolute inset-5 rounded-full border border-brass/45"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 7, ease: "linear", repeat: Infinity }}
-        >
-          <span className="absolute left-1/2 top-[-5px] size-2.5 -translate-x-1/2 rounded-full bg-brass shadow-[0_0_18px_rgba(201,169,97,0.8)]" />
-        </motion.span>
-        <motion.span
-          className="absolute inset-12 rounded-full border border-cream/25"
-          animate={{ rotate: -360 }}
-          transition={{ duration: 5.5, ease: "linear", repeat: Infinity }}
-        >
-          <span className="absolute bottom-2 right-3 size-2 rounded-full bg-cream/80" />
-        </motion.span>
-        <span className="absolute inset-[92px] rounded-full bg-brass/75 shadow-[0_0_55px_rgba(201,169,97,0.34)]" />
-      </motion.div>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(47,107,76,0.16),transparent_58%)]" />
-    </div>
   );
 }

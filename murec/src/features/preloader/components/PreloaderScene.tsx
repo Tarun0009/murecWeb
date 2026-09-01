@@ -4,7 +4,10 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useMemo, useRef, type RefObject } from "react";
 import * as THREE from "three";
 
-type Props = { progressRef: RefObject<number> };
+type Props = {
+  progressRef: RefObject<number>;
+  onReady?: () => void;
+};
 
 function DollyCamera({ progressRef }: Props) {
   const { camera } = useThree();
@@ -121,13 +124,14 @@ function DustField({ progressRef }: Props) {
   );
 }
 
-export default function PreloaderScene({ progressRef }: Props) {
+export default function PreloaderScene({ progressRef, onReady }: Props) {
   return (
     <Canvas
       dpr={[1, 1.35]}
       camera={{ position: [0, 1.7, 30], fov: 54 }}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       style={{ background: "transparent" }}
+      onCreated={onReady}
     >
       <ambientLight intensity={0.4} color="#e8e1d3" />
       <directionalLight position={[3, 4, 5]} intensity={1.4} color="#f0e6d2" />
